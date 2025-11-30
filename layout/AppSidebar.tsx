@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
 
-import {FaBox, FaCalendar, FaUser, FaWpforms, FaTable, FaPage4, FaChartPie, FaPlug, FaChevronDown, FaCube} from "react-icons/fa";
+import {FaBox, FaAd, FaCalendar, FaUser, FaWpforms, FaTable, FaPage4, FaChartPie, FaPlug, FaChevronDown, FaCube} from "react-icons/fa";
 import { BiDotsHorizontal } from "react-icons/bi";
 
 type NavItem = {
@@ -33,9 +33,9 @@ const navItems: NavItem[] = [
     path: "/admin/users",
   },
   {
-    icon: <FaUser />,
-    name: "User Profile",
-    path: "/profile",
+    icon: <FaAd />,
+    name: "Status",
+    path: "/admin/status",
   },
 
   {

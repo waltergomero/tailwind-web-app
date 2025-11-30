@@ -1,5 +1,5 @@
 import React from 'react'
-import UserDetailsForm from '@/components/admin/users/userDetailForm';
+import UserDetailsForm from '@/components/admin/users/editUserDetails';
 import {  getUserById } from '@/actions/users';
 
 const UserDetailsPage = async ({ params }: { params: Promise<{ id: string }> }) => {
@@ -7,7 +7,7 @@ const UserDetailsPage = async ({ params }: { params: Promise<{ id: string }> }) 
   const user = await getUserById(id);
   
   return (
-    <UserDetailsForm user={user} />
+    <UserDetailsForm data={user} />
   )
 }
 

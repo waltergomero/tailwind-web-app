@@ -1,17 +1,38 @@
 import React from 'react'
 import StatusTable from '@/components/admin/status/statusTable';
 import { fetchAllStatuses } from '@/actions/status';
+import Link from 'next/link';
+import { PlusIcon } from '@heroicons/react/24/solid';
 
 
 const StatusPage = async () => {
   const result = await fetchAllStatuses();
   
   return (
-    <div className="mx-auto max-w-7xl">
-      <h1 className="mb-6 text-3xl font-bold text-black dark:text-white">
-        Status Management
-      </h1>
-      <StatusTable initialData={result.data} />
+    <div className="overflow-hidden rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+      <div className="mb-2">
+        <div className="flex items-center justify-between px-4 py-2">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+              Status Management
+            </h2>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Manage and organize status accounts
+            </p>
+          </div>
+          <Link
+            href="/admin/status/add"
+            className="inline-flex items-center gap-2 px-4 py-1 bg-gray-700 text-white text-xs rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors whitespace-nowrap"
+          >
+            <PlusIcon className="w-5 h-5" />
+            Add Status
+          </Link>
+        </div>
+        <hr className="border-t border-gray-200 dark:border-white/5" />
+      </div>
+      <div className='p-4'>
+            <StatusTable data={result.data} />
+      </div>
     </div>
   )
 }

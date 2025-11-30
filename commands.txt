@@ -1,0 +1,22 @@
+
+-- reset DATABASE
+npm run prisma:reset
+
+-- generate
+npm run prisma:generate
+
+--create migration
+npm run prisma:migrate --name add-create
+
+--seed
+npm run db:seed
+
+-- to view database tables
+npm run prisma:studio
+
+
+
+
+//github repo; https://github.com/bradtraversy/prostore
+
+

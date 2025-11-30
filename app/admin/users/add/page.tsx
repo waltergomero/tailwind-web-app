@@ -1,10 +1,10 @@
 import React, { Fragment } from 'react';
-import UserAddForm from '@/components/admin/users/userAddForn';
+import AddUserForm from '@/components/admin/users/addUserForm';
 
 const AddUserPage = () => {
   return (
     <Fragment>
-        <UserAddForm />
+        <AddUserForm />
     </Fragment>
   )
 }

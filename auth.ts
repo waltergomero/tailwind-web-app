@@ -3,8 +3,7 @@ import NextAuth from "next-auth"
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
-import connectDB from "./config/database";
-import User from "./models/users";
+import prisma  from '@/lib/prisma';
 import bcryptjs from "bcryptjs";
 import { authConfig } from './auth.config';
 
@@ -31,6 +30,7 @@ declare module "next-auth" {
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.AUTH_SECRET,
+  trustHost: true,
   pages: {
     signIn: '/signin',
     error: '/signin',
@@ -50,23 +50,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (credentials == null) return null;
 
         // Find user in database
-        await connectDB();
-        const user = await User.findOne({
-          email: credentials.email as string,
-        }).lean() as { _id: string; first_name: string; last_name: string; name: string; email: string; password: string; isadmin?: boolean; image?: string } | null;
+         const user = await prisma.user.findFirst({
+          where: {
+            email: credentials.email as string,
+          },
+        });
 
-        if (user) {
+        // Check if user exists and if the password matches
+        if (
+          user &&
+          typeof user.password === 'string' &&
+          typeof credentials.password === 'string'
+        ) {
           const isMatch = await bcryptjs.compare(credentials.password as string, user.password);
           // If password is correct, return user
           if (isMatch) {
             return {
-              id: user._id.toString(),
+              id: user.id,
               name: user.name,
-              first_name: user.first_name,
-              last_name: user.last_name,
               email: user.email,
               isadmin: user.isadmin,
-              image: typeof user.image === 'string' ? user.image : null,
             };
           }
         }

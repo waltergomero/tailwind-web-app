@@ -1,25 +1,17 @@
 'use server';
 
-import { signUpSchema, updateUserFormSchema, addUserFormSchema} from "@/schemas/schemaValidation";
-import { email, ZodError } from "zod";
-import { signIn } from "@/auth";
+import { signUpSchema, updateUserFormSchema, addUserFormSchema, addStatusFormSchema} from "@/schemas/schemaValidation";
+import { ZodError } from "zod";
 import { AuthError } from "next-auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import User from "@/models/users";
 import bcryptjs from "bcryptjs";
-import connectDB from "@/config/database";
-import { convertToPlainObject } from "@/lib/utils";
+import prisma  from '@/lib/prisma';
+import { is } from "zod/locales";
 
-
-// Constants
-const DEFAULT_PAGE_LIMIT = 10;
-const BCRYPT_SALT_ROUNDS = 12;
-
-interface UserData {
-  _id: string;
+export interface UserData {
+  id: string;
   first_name: string;
   last_name: string;
-  name: string;
   email: string;
   isadmin: boolean;
   isactive: boolean;
@@ -27,171 +19,114 @@ interface UserData {
   updatedAt: string;
 }
 
-interface UsersResult {
-  data: UserData[];
-  totalPages: number;
-}
-
-interface GetUsersParams {
-  limit?: number;
-  page: number;
-  query?: string;
-}
-
-interface ActionResult {
-  success: boolean;
-  message: string;
-  data?: any;
-}
-
-interface ValidationResult {
-  success: false;
-  errors: Record<string, string[]>;
-}
 
 /**
- * get all users from the database
+ * Get all users from the database
  */
-export async function fetchAllUsers({ 
-  limit = DEFAULT_PAGE_LIMIT, 
-  page, 
-  query 
-}: GetUsersParams): Promise<UsersResult> {
+export async function fetchAllUsers(): Promise<{ data: UserData[] }> {
   try {
-    await connectDB();
-    const queryFilter = query && query !== 'all'
-      ? {
-          $or: [
-            { last_name: { $regex: query, $options: 'i' } },
-            { first_name: { $regex: query, $options: 'i' } },
-            { email: { $regex: query, $options: 'i' } },
-          ],
-        }
-      : {};
+    const users = await prisma.user.findMany({
+      orderBy: [
+        { last_name: 'asc' },
+        { first_name: 'asc' }
+      ],
+      select: {
+        id: true,
+        first_name: true,
+        last_name: true,
+        email: true,
+        isadmin: true,
+        isactive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
 
-    const [users, dataCount] = await Promise.all([
-      User.find(queryFilter)
-        .sort({ createdAt: -1 })
-        .limit(limit)
-        .skip((page - 1) * limit)
-        .select('_id first_name last_name name email isadmin isactive createdAt updatedAt')
-        .lean(),
-      User.countDocuments(queryFilter),
-    ]);
+    const data: UserData[] = users.map(user => ({
+      id: user.id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      isadmin: user.isadmin,
+      isactive: user.isactive,
+      createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt.toISOString(),
+    }));
 
-    const data = users.map(user => ({
-      ...(convertToPlainObject(user) as object),
-      _id: user._id.toString(),
-    })) as UserData[];
-
-    return {
-      data,
-      totalPages: Math.ceil(dataCount / limit),
-    };
+    return { data };
   } catch (error) {
-    console.error('Error fetching users:', error);
+    console.error("Error fetching users:", error);
     throw new Error('Failed to fetch users');
   }
 }
 
 /**
- * Get user by ID
+ * get user by id from the database
  */
-export async function getUserById(userId: string) {
+export async function getUserById(id: string): Promise<UserData | null> {
   try {
-    await connectDB();
-    const user = await User.findOne({
-      _id: userId,
-    }).lean();
-
+    const user = await prisma.user.findUnique({
+      where: { id },
+    });
     if (!user) {
-      throw new Error('User not found');
+      return null;
     }
-    
-    // Convert to plain object for client components
-    const plainUser = {
-      ...(convertToPlainObject(user) as object),
-      _id: user._id.toString(),
+    return {
+      id: user.id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email ?? '',
+      isadmin: user.isadmin ?? false,
+      isactive: user.isactive ?? false,
+      createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt?.toISOString() ?? '',
     };
-    
-    return plainUser;
   } catch (error) {
-    console.error('Error fetching user:', error);
-    throw error;
+    console.error("Error fetching user by id:", error);
+    return null;
   }
 }
 
 /**
- * Delete a user by ID
+ * add a new user to the database
  */
-export async function deleteUser(userId: string): Promise<{ success: boolean; message?: string }> {
+export async function addUser(data: FormData) {
+  console.log("Form Data received in addUser:", data);
   try {
-    await connectDB();
-    
-    const user = await User.findById(userId);
-    
-    if (!user) {
-      return { success: false, message: 'User not found' };
-    }
-    
-    await User.findByIdAndDelete(userId);
-    
-    return { success: true, message: 'User deleted successfully' };
-  } catch (error) {
-    console.error('Error deleting user:', error);
-    return { success: false, message: 'Failed to delete user' };
-  }
-}
+    const first_name = data.get("first_name") as string;
+    const last_name = data.get("last_name") as string;
+    const email = data.get("email") as string;
+    const isadmin = data.get("isadmin") === "on" ? true : false;
+    const password = data.get("password") as string;
 
-
-/**
- * Add user
- */
-export async function addUser(
-  prevState: { success?: boolean; message?: string; errors?: Record<string, string> } | null,
-  formData: FormData
-) {
-  try {
-    console.log('FormData received in addUser:', formData);
-    // Extract and validate form data
-    const first_name = formData.get('first_name') as string;
-    const last_name = formData.get('last_name') as string;
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const isadmin = Boolean(formData.get('isadmin')) || false;
-
-
-    addUserFormSchema.parse({ first_name, last_name, email, password, isadmin });
-    // Here you would typically call your backend API to create the user
-    // For demonstration, we'll assume the user is created successfully
-
-    //check if user already exists logic would go here in a real app
-    await connectDB();
-    
-    const userAlreadyExists = await User.findOne({ email });
-    if (userAlreadyExists) {
+    // Validate all fields - this will throw ZodError if validation fails
+    const validatedData = addUserFormSchema.parse({ first_name, last_name, email, password, isadmin });
+    //check for duplicate email
+    const existingUser = await prisma.user.findFirst({
+      where: { email: validatedData.email }
+        });
+    if (existingUser) {
       return {
         success: false,
-        message: `User with this email ${email} already exists. Please sign in instead.`
+        message: `A user with this email ${validatedData.email} already exists.`,
+        errors: { email: 'Email must be unique.' }
       };
     }
-
-    // hash password and save user to database logic would go here in a real app
-    const hashedPassword = await bcryptjs.hash(password, BCRYPT_SALT_ROUNDS);
-
-    const newUser = new User({
-      first_name,
-      last_name,
-      name: `${first_name} ${last_name}`,
-      email,
-      password: hashedPassword,
-      isadmin: isadmin ?? false,
+    
+    const newUser = await prisma.user.create({
+      data: {
+        first_name: validatedData.first_name,
+        last_name: validatedData.last_name,
+        email: validatedData.email,
+        isadmin: isadmin,
+        password: await bcryptjs.hash(validatedData.password, 12)
+      },
     });
-    await newUser.save();
 
     return {
       success: true,
-      message: 'Sign up successful. You can now sign in.'
+      message: 'User created successfully',
+      data: newUser
     };
   } catch (error) {
     // Re-throw redirect errors - these are expected from Next.js
@@ -223,84 +158,135 @@ export async function addUser(
 }
 
 /**
- * Add user
+ * add a new user to the database
  */
-export async function updateUser(
-    prevState: { success?: boolean; message?: string; errors?: Record<string, string> } | null,
-    formData: FormData)
-{  try {
-    // Extract and validate form data
-    console.log('FormData received in updateUser:', formData);
-    const first_name = formData.get('first_name') as string;
-    const last_name = formData.get('last_name') as string;
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const userId = formData.get('userId') as string;
-    //if isadmin and isactive are present, get their boolean values
-    const isadmin = Boolean(formData.get('isadmin'));
-    const isactive = Boolean(formData.get('isactive'));
-    
-    updateUserFormSchema.parse({ first_name, last_name, email, password, isadmin, isactive });
+export async function updateUser(data: FormData) {
+  console.log("Form Data received in updateUser:", data);
+  try {
+    const first_name = data.get("first_name") as string;
+    const last_name = data.get("last_name") as string;
+    const email = data.get("email") as string;
+    const id = data.get("id") as string;
+    const password = data.get("password") as string;
+    const isadmin = data.get("isadmin") === "on";
+    const isactive = data.get("isactive") === "on";
 
-    await connectDB();
+    // Validate all fields - this will throw ZodError if validation fails
+    const validatedData = updateUserFormSchema.parse({ first_name, last_name, email, isadmin, isactive});
 
-    const existingUser = await User.findOne({ email });
-    console.log('Existing user with email check:', existingUser._id, userId);
-    if (existingUser._id.toString() !== userId) {
+    // Validate password separately if provided
+    if (password && password.trim().length > 0) {
+      if (password.trim().length < 6) {
+        return {
+          success: false,
+          message: 'Password must be at least 6 characters',
+          errors: { password: 'Password must be at least 6 characters' }
+        };
+      }
+    }
+
+    //check for duplicate status_name
+    const existingUser = await prisma.user.findFirst({
+      where: { email: validatedData.email }  
+        });
+    if (existingUser && existingUser.id !== id) {
       return {
         success: false,
-        message: `User with this email ${email} already exists. Please sign in instead.`
+        message: `A user with this email ${validatedData.email} already exists.`,
+        errors: { email: 'Email must be unique.' }
       };
     }
+    // Prepare update data
+    const updateData: any = {
+      first_name: validatedData.first_name,
+      last_name: validatedData.last_name,
+      email: validatedData.email,
+      isadmin: isadmin,
+      isactive: isactive
+    };
 
-   let newPssword = '';
-    // Hash new password if provided
-    if (password?.trim()) {
-      newPssword = await bcryptjs.hash(password, BCRYPT_SALT_ROUNDS);
+    // Only include password if it's provided and not empty
+    if (password && password.trim().length > 0) {
+      updateData.password = await bcryptjs.hash(password, 12);
     }
 
-    // Update user
-    await User.findByIdAndUpdate(
-      userId,
-      {
-        first_name,
-        last_name,
-        name: `${first_name} ${last_name}`,
-        email,
-        isadmin: isadmin ?? false,
-        isactive: isactive ?? true,
-        ...(newPssword && { password: newPssword }),
-      },
-    );
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: updateData,
+    });
+    
     return {
       success: true,
-      message: 'Sign up successful. You can now sign in.'
+      message: 'User updated successfully',
+      data: updatedUser
     };
   } catch (error) {
     // Re-throw redirect errors - these are expected from Next.js
     if (isRedirectError(error)) {
-        throw error;
+      throw error;
     }
     // Handle validation errors
-    if (error instanceof ZodError) {    
-        const fieldErrors: Record<string, string> = {};
-        for (const issue of error.issues) {
-            const field = issue.path[0] as string;
-            if (field && !fieldErrors[field]) {
-                fieldErrors[field] = issue.message;
-            }
+    if (error instanceof ZodError) {
+      const fieldErrors: Record<string, string> = {};
+      for (const issue of error.issues) {
+        const field = issue.path[0] as string;
+        if (field && !fieldErrors[field]) {
+          fieldErrors[field] = issue.message;
         }
-        return { 
-            success: false, 
-            message: 'Validation failed. Required fields are missing or invalid.',
-            errors: fieldErrors
-        };
-    }   
+      }
+      return { 
+        success: false, 
+        message: 'Validation failed. Required fields are missing or invalid.',
+        errors: fieldErrors
+      };
+    }
     // Handle all other errors
     console.error("Unexpected error:", error);
     return { 
-        success: false, 
-        message: 'An unexpected error occurred. Please try again.' 
+      success: false, 
+      message: 'An unexpected error occurred. Please try again.' 
     };
- }
+  }
 }
+
+
+/**
+ * delete status from the database
+ */
+export async function deleteUser(id: string) {
+  try {
+    // Check if the status exists
+    const existingUser = await prisma.user.findUnique({
+      where: { id }
+    });
+
+    if (!existingUser) {
+      return {
+        success: false,
+        message: 'User not found'
+      };
+    }
+
+    // Delete the user
+    await prisma.user.delete({
+      where: { id }
+    });
+
+    return {
+      success: true,
+      message: 'User deleted successfully'
+    };
+  } catch (error) {
+    // Re-throw redirect errors
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
+    console.error("Error deleting user:", error);
+    return {
+      success: false,
+      message: 'Failed to delete user. Please try again.'
+    };
+  }
+}
+
