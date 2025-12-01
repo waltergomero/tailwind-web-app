@@ -1,22 +1,19 @@
 import { PrismaClient } from '../app/generated/prisma/client'
+import { withAccelerate } from '@prisma/extension-accelerate'
 
 const globalForPrisma = global as unknown as { 
-    prisma: PrismaClient
+    prisma: ReturnType<typeof createPrismaClient>
 }
 
-// Check if using Prisma Accelerate URL
+// Get database URL from environment
 const databaseUrl = process.env.DATABASE_URL || ''
-const isAccelerateUrl = databaseUrl.startsWith('prisma://') || databaseUrl.startsWith('prisma+postgres://')
 
-// Create Prisma client without Accelerate extension for regular database URLs
+// Create Prisma client with proper Prisma 7 configuration
 const createPrismaClient = () => {
-  if (isAccelerateUrl) {
-    // Use Accelerate for prisma:// URLs
-    const { withAccelerate } = require('@prisma/extension-accelerate')
-    return new PrismaClient().$extends(withAccelerate())
-  }
-  // Use regular Prisma Client for postgresql:// URLs
-  return new PrismaClient()
+  // Since you're using Prisma Accelerate, pass the URL as accelerateUrl
+  return new PrismaClient({
+    accelerateUrl: databaseUrl,
+  }).$extends(withAccelerate())
 }
 
 const prisma = globalForPrisma.prisma || createPrismaClient()

@@ -2,7 +2,6 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
-import Twitter from "next-auth/providers/twitter";
 import Credentials from "next-auth/providers/credentials";
 import prisma  from '@/lib/prisma';
 import bcryptjs from "bcryptjs";
@@ -51,11 +50,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         },
       },
     }),
-    Twitter({
-      clientId: process.env.AUTH_TWITTER_ID,
-      clientSecret: process.env.AUTH_TWITTER_SECRET,
+    GitHub({
+      clientId: process.env.AUTH_GITHUB_ID,
+      clientSecret: process.env.AUTH_GITHUB_SECRET,
     }),
-    GitHub,
     Credentials({
       credentials: {
         email: { type: 'email' },
@@ -94,6 +92,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               id: user.id,
               name: user.name,
               email: user.email,
+              first_name: user.first_name,
+              last_name: user.last_name,
               isadmin: user.isadmin,
             };
           }

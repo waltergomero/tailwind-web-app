@@ -6,11 +6,12 @@ import Button from "@/components/ui/button/Button";
 import { TbArrowLeft, TbEye, TbEyeOff} from 'react-icons/tb';
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { signInWithCredentials } from "@/actions/authActions";
 import { toast } from "react-toastify";
-import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { useRouter, useSearchParams } from "next/navigation";
 import SocialButtons from "./socialButtons";
+import { signIn } from "next-auth/react";
+import { signInSchema } from "@/schemas/schemaValidation";
+import { ZodError } from "zod";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -39,27 +40,55 @@ export default function SignInForm() {
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
     
+    // Reset field errors
+    setFieldErrors({});
+    
     try {
-      const result = await signInWithCredentials(null, formData);
+      // Extract form data
+      const email = formData.get('email') as string;
+      const password = formData.get('password') as string;
+
+      // Validate with Zod
+      signInSchema.parse({ email, password });
+
+      // Sign in with NextAuth (client-side)
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+
       console.log("Sign in result:", result);
-      if (result?.success) {
-        // On successful sign-in, refresh and redirect
+      
+      if (result?.error) {
+        // Handle sign-in errors
+        if (result.error === 'CredentialsSignin') {
+          toast.error('Invalid email or password. Please try again.');
+        } else {
+          toast.error(result.error);
+        }
+      } else if (result?.ok) {
+        // On successful sign-in, redirect
+        toast.success('Sign in successful!');
         router.push('/admin');
         router.refresh();
-      } else if (result && !result.success) {
-        // Set field-specific errors if available
-        if ('errors' in result && result.errors && typeof result.errors === 'object') {
-          setFieldErrors(result.errors as Record<string, string>);
-        }
-        toast.error(result.message);
       }
     } catch (err) {
-      // Re-throw redirect errors - these are expected from NextAuth on successful login
-      if (isRedirectError(err)) {
-        throw err;
+      // Handle validation errors
+      if (err instanceof ZodError) {
+        const errors: Record<string, string> = {};
+        for (const issue of err.issues) {
+          const field = issue.path[0] as string;
+          if (field && !errors[field]) {
+            errors[field] = issue.message;
+          }
+        }
+        setFieldErrors(errors);
+        toast.error('Validation failed. Please check your input.');
+      } else {
+        console.error("Sign in error:", err);
+        toast.error("An unexpected error occurred. Please try again.");
       }
-      console.error("Sign in error:", err);
-      toast.error("An unexpected error occurred. Please try again.");
     }
   };
 
@@ -72,7 +101,7 @@ export default function SignInForm() {
           className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
         >
           <TbArrowLeft />
-          Back to dashboard
+          Back to home page
         </Link>
       </div>
       <div className="flex flex-col justify-center flex-1 w-full max-w-lg mx-auto">

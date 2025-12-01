@@ -5,8 +5,8 @@ import { ZodError } from "zod";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import User from "@/models/users";
 import bcryptjs from "bcryptjs";
+import prisma from "@/lib/prisma";
 
 
 
@@ -35,6 +35,48 @@ function handleSignInError(error: unknown) {
     return handleValidationError(error);
   }
 
+  // Log the full error structure for debugging
+  console.log("Full error object:", error);
+  console.log("Error type:", error instanceof AuthError ? 'AuthError' : typeof error);
+  if (error instanceof Error) {
+    console.log("Error message:", error.message);
+    console.log("Error cause:", (error as any).cause);
+  }
+
+  // Try to extract provider mismatch message from any error type
+  let providerMessage = null;
+  
+  if (error instanceof Error) {
+    // Check error.cause.err.message
+    const causeErr = (error as any).cause?.err;
+    if (causeErr?.message && causeErr.message.includes('registered with')) {
+      providerMessage = causeErr.message;
+    }
+    
+    // Check error.message directly
+    if (!providerMessage && error.message?.includes('registered with')) {
+      providerMessage = error.message;
+    }
+    
+    // Check if the error message contains the pattern [auth][cause]: Error:
+    if (!providerMessage && error.message) {
+      const match = error.message.match(/Error:\s*(.+registered with.+)/i);
+      if (match) {
+        providerMessage = match[1];
+      }
+    }
+  }
+  
+  // If we found a provider mismatch message, return it
+  if (providerMessage) {
+    console.log("Extracted provider message:", providerMessage);
+    return {
+      success: false,
+      message: providerMessage
+    };
+  }
+
+  // Handle standard AuthError with CredentialsSignin
   if (error instanceof AuthError && error.type === 'CredentialsSignin') {
     return {
       success: false,
@@ -101,10 +143,12 @@ export async function signUp(
     const password = formData.get('password') as string;
 
     signUpSchema.parse({ first_name, last_name, email, password });
-    // Here you would typically call your backend API to create the user
-    // For demonstration, we'll assume the user is created successfully
 
-    const userAlreadyExists = await User.findOne({ email });
+    // Check if user already exists
+    const userAlreadyExists = await prisma.user.findFirst({
+      where: { email }
+    });
+    
     if (userAlreadyExists) {
       return {
         success: false,
@@ -112,18 +156,19 @@ export async function signUp(
       };
     }
 
-    // hash password and save user to database logic would go here in a real app
+    // Hash password and create user
     const hashedPassword = await bcryptjs.hash(password, BCRYPT_SALT_ROUNDS);
 
-    const newUser = new User({
-      first_name,
-      last_name,
-      name: `${first_name} ${last_name}`,
-      email,
-      password: hashedPassword,
-      provider: 'credentials' // Track that user signed up with credentials
+    await prisma.user.create({
+      data: {
+        first_name,
+        last_name,
+        name: `${first_name} ${last_name}`,
+        email,
+        password: hashedPassword,
+        provider: 'credentials' // Track that user signed up with credentials
+      }
     });
-    await newUser.save();
 
     return {
       success: true,
