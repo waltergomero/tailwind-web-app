@@ -29,15 +29,19 @@ const navItems: NavItem[] = [
   },
    {
     icon: <FaUser />,
-    name: "Users",
-    path: "/admin/users",
+    name: "Categories",
+    path: "/admin/categories",
   },
   {
     icon: <FaAd />,
     name: "Status",
     path: "/admin/status",
   },
-
+   {
+    icon: <FaUser />,
+    name: "Users",
+    path: "/admin/users",
+  },
   {
     name: "Forms",
     icon: <FaWpforms />,

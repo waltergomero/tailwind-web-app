@@ -1,29 +1,17 @@
 'use server';
 
-import { signUpSchema, updateUserFormSchema, addUserFormSchema, addStatusFormSchema} from "@/schemas/schemaValidation";
+import {  updateUserFormSchema, addUserFormSchema, } from "@/schemas/schemaValidation";
 import { ZodError } from "zod";
-import { AuthError } from "next-auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import bcryptjs from "bcryptjs";
 import prisma  from '@/lib/prisma';
-import { is } from "zod/locales";
-
-export interface UserData {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  isadmin: boolean;
-  isactive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import { IUser } from "@/interfaces/interface"; 
 
 
 /**
  * Get all users from the database
  */
-export async function fetchAllUsers(): Promise<{ data: UserData[] }> {
+export async function fetchAllUsers(): Promise<{ data: IUser[] }> {
   try {
     const users = await prisma.user.findMany({
       orderBy: [
@@ -34,6 +22,7 @@ export async function fetchAllUsers(): Promise<{ data: UserData[] }> {
         id: true,
         first_name: true,
         last_name: true,
+        name: true,
         email: true,
         isadmin: true,
         isactive: true,
@@ -42,10 +31,11 @@ export async function fetchAllUsers(): Promise<{ data: UserData[] }> {
       },
     });
 
-    const data: UserData[] = users.map(user => ({
+    const data: IUser[] = users.map((user: typeof users[0]): IUser => ({
       id: user.id,
       first_name: user.first_name,
       last_name: user.last_name,
+      name: user.name,
       email: user.email,
       isadmin: user.isadmin,
       isactive: user.isactive,
@@ -63,7 +53,7 @@ export async function fetchAllUsers(): Promise<{ data: UserData[] }> {
 /**
  * get user by id from the database
  */
-export async function getUserById(id: string): Promise<UserData | null> {
+export async function getUserById(id: string): Promise<IUser | null> {
   try {
     const user = await prisma.user.findUnique({
       where: { id },
@@ -76,6 +66,7 @@ export async function getUserById(id: string): Promise<UserData | null> {
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email ?? '',
+      name: user.name ?? '',
       isadmin: user.isadmin ?? false,
       isactive: user.isactive ?? false,
       createdAt: user.createdAt.toISOString(),
@@ -200,6 +191,7 @@ export async function updateUser(data: FormData) {
     const updateData: any = {
       first_name: validatedData.first_name,
       last_name: validatedData.last_name,
+      name: `${validatedData.first_name} ${validatedData.last_name}`,
       email: validatedData.email,
       isadmin: isadmin,
       isactive: isactive

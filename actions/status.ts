@@ -3,26 +3,17 @@
 import { addStatusFormSchema, updateStatusFormSchema} from "@/schemas/schemaValidation";
 import { AuthError } from "next-auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import Status from "@/models/status";
 import prisma  from '@/lib/prisma';
-import { convertToPlainObject } from "@/lib/utils";
 import { ZodError } from "zod";
+import { IStatus } from "@/interfaces/interface";
 
-export interface StatusData {
-  id: string;
-  status_name: string;
-  typeid: number;
-  description: string;
-  isactive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+
 
 /**
  * Get all statuses from the database
  * @returns Promise containing array of status data
  */
-export async function fetchAllStatuses(): Promise<{ data: StatusData[] }> {
+export async function fetchAllStatuses(): Promise<{ data: IStatus[] }> {
   try {
     const statuses = await prisma.status.findMany({
       orderBy: [
@@ -40,7 +31,7 @@ export async function fetchAllStatuses(): Promise<{ data: StatusData[] }> {
       },
     });
 
-    const data: StatusData[] = statuses.map(status => ({
+    const data: IStatus[] = statuses.map((status: typeof statuses[0]) => ({
       id: status.id,
       status_name: status.status_name,
       typeid: status.typeid,
@@ -61,7 +52,7 @@ export async function fetchAllStatuses(): Promise<{ data: StatusData[] }> {
 /**
  * get status by id from the database
  */
-export async function getStatusById(id: string): Promise<StatusData | null> {
+export async function getStatusById(id: string): Promise<IStatus | null> {
   try {
     const status = await prisma.status.findUnique({
       where: { id },
@@ -188,7 +179,7 @@ export async function updateStatus(data: FormData) {
       };
     }
     
-    const newStatus = await prisma.status.update({
+    const updatedStatus = await prisma.status.update({
     where: { id },
       data: {
         status_name: validatedData.status_name,
@@ -202,7 +193,7 @@ export async function updateStatus(data: FormData) {
     return {
       success: true,
       message: 'Status updated successfully',
-      data: newStatus
+      data: updatedStatus
     };
   } catch (error) {
     // Re-throw redirect errors - these are expected from Next.js

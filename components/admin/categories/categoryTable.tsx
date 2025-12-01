@@ -18,20 +18,20 @@ import {
   PlusIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
-import { deleteUser } from '@/actions/users';
+import { deleteCategory } from '@/actions/categories';
 import { useRouter } from 'next/navigation';
 import {formatId} from '@/lib/utils';
-import {IUser} from '@/interfaces/interface';
+import {ICategory} from '@/interfaces/interface';
 
 
-interface UserTableProps {
-  data: IUser[];
+interface CategoryTableProps {
+  data: ICategory[];
   onDelete?: (id: string, name: string) => void;
 }
-const UserTable = ({ data, onDelete }: UserTableProps) => {
+const CategoryTable = ({ data, onDelete }: CategoryTableProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<{ id: string; name: string } | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<{ id: string; name: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
@@ -40,36 +40,35 @@ const UserTable = ({ data, onDelete }: UserTableProps) => {
     if (!searchTerm.trim()) return data;
     
     const lowerSearch = searchTerm.toLowerCase();
-    return data.filter((status) => 
-      status.first_name.toLowerCase().includes(lowerSearch) ||
-      status.last_name.toLowerCase().includes(lowerSearch) ||
-      status.email?.toLowerCase().includes(lowerSearch)
+    return data.filter((category) => 
+      category.category_name.toLowerCase().includes(lowerSearch) ||
+      category.description?.toLowerCase().includes(lowerSearch)
     );
   }, [data, searchTerm]);
 
   const handleDeleteClick = (id: string, name: string) => {
-    setSelectedUser({ id, name });
+    setSelectedCategory({ id, name });
     setIsDeleteModalOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedUser) return;
+    if (!selectedCategory) return;
 
     setIsDeleting(true);
     try {
-      const result = await deleteUser(selectedUser.id);
+      const result = await deleteCategory(selectedCategory.id);
       
       if (result.success) {
         setIsDeleteModalOpen(false);
-        setSelectedUser(null);
+        setSelectedCategory(null);
         // Refresh the page to show updated data
         router.refresh();
       } else {
-        alert(result.message || 'Failed to delete user');
+        alert(result.message || 'Failed to delete category');
       }
     } catch (error) {
-      console.error('Error deleting user:', error);
-      alert('An error occurred while deleting the user');
+      console.error('Error deleting status:', error);
+      alert('An error occurred while deleting the status');
     } finally {
       setIsDeleting(false);
     }
@@ -77,7 +76,7 @@ const UserTable = ({ data, onDelete }: UserTableProps) => {
 
   const handleDeleteCancel = () => {
     setIsDeleteModalOpen(false);
-    setSelectedUser(null);
+    setSelectedCategory(null);
   };
 
   return (
@@ -93,9 +92,9 @@ const UserTable = ({ data, onDelete }: UserTableProps) => {
               name='search_input'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by status name, description, or type..."
+              placeholder="Search by category name, or description .."
               className="block w-1/2 pl-10 pr-10 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              aria-label="Search status"
+              aria-label="Search category"
             />
             {searchTerm && (
               <button
@@ -120,16 +119,10 @@ const UserTable = ({ data, onDelete }: UserTableProps) => {
                   ID
                 </TableCell>
                 <TableCell isHeader className="px-5 py-3 font-semibold text-gray-200 text-start text-theme-xs dark:text-gray-200">
-                  First Name
-                </TableCell>
-                <TableCell isHeader  className="px-5 py-3 font-semibold text-gray-200 text-start text-theme-xs dark:text-gray-200">
-                  Last Name
+                  Category Name
                 </TableCell>
                 <TableCell  isHeader  className="px-5 py-3 font-semibold text-gray-200 text-start text-theme-xs dark:text-gray-200">
-                  Complete Name
-                </TableCell>
-                <TableCell  isHeader  className="px-5 py-3 font-semibold text-gray-200 text-start text-theme-xs dark:text-gray-200">
-                  Email
+                  Description
                 </TableCell>
                 <TableCell isHeader className="px-5 py-3 font-semibold text-gray-200 text-start text-theme-xs dark:text-gray-200">
                   Is Active?
@@ -145,50 +138,44 @@ const UserTable = ({ data, onDelete }: UserTableProps) => {
               {filteredData.length === 0 ? (
                 <TableRow>
                   <td colSpan={6} className="px-5 py-8 text-center text-gray-500 dark:text-gray-400">
-                    {searchTerm ? 'No users found matching your search.' : 'No users available.'}
+                    {searchTerm ? 'No categories found matching your search.' : 'No categories available.'}
                   </td>
                 </TableRow>
               ) : (
-                filteredData.map((user) => (
-                <TableRow key={user.id}>
+                filteredData.map((category) => (
+                <TableRow key={category.id}>
                   <TableCell className="px-5 py-2 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {formatId(user.id)}
+                    {formatId(category.id)}
                   </TableCell>
                   <TableCell className="px-4 py-2 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {user.first_name}
+                    {category.category_name}
                   </TableCell>
                   <TableCell className="px-4 py-2 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {user.last_name}
-                  </TableCell>
-                  <TableCell className="px-4 py-2 text-gray-500 text-theme-sm dark:text-gray-400">
-                    {user.name}
-                  </TableCell>
-                  <TableCell className="px-4 py-2 text-gray-500 text-theme-sm dark:text-gray-400">
-                    {user.email}
+                    {category.description}
                   </TableCell>
                   <TableCell className="px-4 py-2 text-gray-500 text-theme-sm dark:text-gray-400">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          user.isactive
+                          category.isactive
                             ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
                             : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                         }`}>
-                        {user.isactive ? 'Yes' : 'No'}
+                        {category.isactive ? 'Yes' : 'No'}
                       </span>
                   </TableCell>
                   <TableCell className="px-4 py-2 text-gray-500 text-theme-sm dark:text-gray-400">
                     <div className="flex items-center justify-center gap-4">
                         <Link 
-                          href={`/admin/users/${user.id}`}
-                          title="Edit user"
-                          aria-label={`Edit ${user.first_name}`}
+                          href={`/admin/category/${category.id}`}
+                          title="Edit category"
+                          aria-label={`Edit ${category.category_name}`}
                         >
                           <PencilIcon className="w-5 h-5 text-gray-500" />
                         </Link>
                         <button 
-                          onClick={() => handleDeleteClick(user.id, user.first_name + ", " + user.last_name)}
-                          title="Delete user"
-                          aria-label={`Delete ${user.last_name}`}
+                          onClick={() => handleDeleteClick(category.id, category.category_name)}
+                          title="Delete category"
+                          aria-label={`Delete ${category.category_name}`}
                         >
                           <TrashIcon className="w-5 h-5 text-red-400" />
                         </button>
@@ -210,11 +197,11 @@ const UserTable = ({ data, onDelete }: UserTableProps) => {
         </div>
         
         <h3 className="text-lg font-semibold text-center text-gray-900 dark:text-white mb-2">
-          Delete User
+          Delete Category
         </h3>
         
         <p className="text-sm text-center text-gray-600 dark:text-gray-400 mb-6">
-          Are you sure you want to delete <span className="font-semibold text-gray-900 dark:text-white">{selectedUser?.name}</span>? 
+          Are you sure you want to delete <span className="font-semibold text-gray-900 dark:text-white">{selectedCategory?.name}</span>? 
           This action cannot be undone.
         </p>
         
@@ -240,4 +227,4 @@ const UserTable = ({ data, onDelete }: UserTableProps) => {
   )
 }
 
-export default UserTable
+export default CategoryTable

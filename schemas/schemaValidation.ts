@@ -50,3 +50,15 @@ export const updateStatusFormSchema = z.object({
   description: z.string().optional(),
   isactive: z.boolean(),
 });
+
+export const addCategoryFormSchema = z.object({
+  category_name: z.string().nonempty('Category name is required'),
+  description: z.string().optional(),
+  isactive: z.boolean().optional(),
+});
+
+export const updateCategoryFormSchema = z.object({
+  category_name: z.string().nonempty('Category name is required'),
+  description: z.string().optional(),
+  isactive: z.boolean(),
+});

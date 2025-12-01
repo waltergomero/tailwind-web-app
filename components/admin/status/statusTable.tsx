@@ -21,19 +21,12 @@ import {
 } from '@heroicons/react/24/outline';
 import { deleteStatus } from '@/actions/status';
 import { useRouter } from 'next/navigation';
+import {formatId} from '@/lib/utils';
+import {IStatus} from '@/interfaces/interface';
 
-interface Status {
-  id: string;
-  status_name: string;
-  typeid: number;
-  description: string;
-  isactive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
 
 interface StatusTableProps {
-  data: Status[];
+  data: IStatus[];
   onDelete?: (id: string, name: string) => void;
 }
 const StatusTable = ({ data, onDelete }: StatusTableProps) => {
@@ -157,7 +150,7 @@ const StatusTable = ({ data, onDelete }: StatusTableProps) => {
                 filteredData.map((status) => (
                 <TableRow key={status.id}>
                   <TableCell className="px-5 py-2 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    ...{status.id.slice(-6)}
+                    {formatId(status.id)}
                   </TableCell>
                   <TableCell className="px-4 py-2 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     {status.status_name}
