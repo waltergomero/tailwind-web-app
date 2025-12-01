@@ -1,21 +1,36 @@
 "use client";
-import Checkbox from "@/components/form/input/Checkbox";
-import Input from "@/components/form/input/InputField";
-import Label from "@/components/form/Label";
+import Checkbox from "@/components/common/form/input/Checkbox";
+import Input from "@/components/common/form/input/InputField";
+import Label from "@/components/common/form/Label";
 import Button from "@/components/ui/button/Button";
-import { TbArrowLeft, TbEye, TbEyeOff, TbBrandGoogle, TbBrandX } from 'react-icons/tb';
+import { TbArrowLeft, TbEye, TbEyeOff} from 'react-icons/tb';
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { signInWithCredentials } from "@/actions/authActions";
 import { toast } from "react-toastify";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import SocialButtons from "./socialButtons";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Check for OAuth error on mount
+  useEffect(() => {
+    const error = searchParams.get('error');
+    console.log("OAuth error param:", error);
+    if (error === 'OAuthAccountNotLinked') {
+      toast.error('This email is already registered with credentials. Please sign in using your email and password instead.');
+    } else if (error === 'AccessDenied') {
+      toast.error('This email is already registered with credentials. Please sign in using your email and password instead.');
+    } else if (error) {
+      toast.error('Authentication failed. Please try again.');
+    }
+  }, [searchParams]);
 
 
   // Handle form submission
@@ -33,8 +48,8 @@ export default function SignInForm() {
         router.refresh();
       } else if (result && !result.success) {
         // Set field-specific errors if available
-        if ('errors' in result && result.errors) {
-          setFieldErrors(result.errors);
+        if ('errors' in result && result.errors && typeof result.errors === 'object') {
+          setFieldErrors(result.errors as Record<string, string>);
         }
         toast.error(result.message);
       }
@@ -68,16 +83,7 @@ export default function SignInForm() {
             </h2>
           </div>
           <div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5">
-              <button className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
-                <TbBrandGoogle className="w-5 h-5 fill-current" />
-                Sign in with Google
-              </button>
-              <button className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
-                <TbBrandX className="w-5 h-5 fill-current" />
-                Sign in with X
-              </button>
-            </div>
+            <SocialButtons />
             <div className="relative py-3 sm:py-5">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200 dark:border-gray-800"></div>

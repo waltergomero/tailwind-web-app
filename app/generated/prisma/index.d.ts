@@ -1374,6 +1374,7 @@ export namespace Prisma {
     emailVerified: Date | null
     image: string | null
     password: string | null
+    provider: string | null
     isadmin: boolean | null
     isactive: boolean | null
     createdAt: Date | null
@@ -1389,6 +1390,7 @@ export namespace Prisma {
     emailVerified: Date | null
     image: string | null
     password: string | null
+    provider: string | null
     isadmin: boolean | null
     isactive: boolean | null
     createdAt: Date | null
@@ -1404,6 +1406,7 @@ export namespace Prisma {
     emailVerified: number
     image: number
     password: number
+    provider: number
     isadmin: number
     isactive: number
     createdAt: number
@@ -1421,6 +1424,7 @@ export namespace Prisma {
     emailVerified?: true
     image?: true
     password?: true
+    provider?: true
     isadmin?: true
     isactive?: true
     createdAt?: true
@@ -1436,6 +1440,7 @@ export namespace Prisma {
     emailVerified?: true
     image?: true
     password?: true
+    provider?: true
     isadmin?: true
     isactive?: true
     createdAt?: true
@@ -1451,6 +1456,7 @@ export namespace Prisma {
     emailVerified?: true
     image?: true
     password?: true
+    provider?: true
     isadmin?: true
     isactive?: true
     createdAt?: true
@@ -1539,6 +1545,7 @@ export namespace Prisma {
     emailVerified: Date | null
     image: string | null
     password: string | null
+    provider: string | null
     isadmin: boolean
     isactive: boolean
     createdAt: Date
@@ -1571,6 +1578,7 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: boolean
     password?: boolean
+    provider?: boolean
     isadmin?: boolean
     isactive?: boolean
     createdAt?: boolean
@@ -1589,6 +1597,7 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: boolean
     password?: boolean
+    provider?: boolean
     isadmin?: boolean
     isactive?: boolean
     createdAt?: boolean
@@ -1604,6 +1613,7 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: boolean
     password?: boolean
+    provider?: boolean
     isadmin?: boolean
     isactive?: boolean
     createdAt?: boolean
@@ -1619,13 +1629,14 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: boolean
     password?: boolean
+    provider?: boolean
     isadmin?: boolean
     isactive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "first_name" | "last_name" | "name" | "email" | "emailVerified" | "image" | "password" | "isadmin" | "isactive" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "first_name" | "last_name" | "name" | "email" | "emailVerified" | "image" | "password" | "provider" | "isadmin" | "isactive" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     account?: boolean | User$accountArgs<ExtArgs>
     session?: boolean | User$sessionArgs<ExtArgs>
@@ -1649,6 +1660,7 @@ export namespace Prisma {
       emailVerified: Date | null
       image: string | null
       password: string | null
+      provider: string | null
       isadmin: boolean
       isactive: boolean
       createdAt: Date
@@ -2086,6 +2098,7 @@ export namespace Prisma {
     readonly emailVerified: FieldRef<"User", 'DateTime'>
     readonly image: FieldRef<"User", 'String'>
     readonly password: FieldRef<"User", 'String'>
+    readonly provider: FieldRef<"User", 'String'>
     readonly isadmin: FieldRef<"User", 'Boolean'>
     readonly isactive: FieldRef<"User", 'Boolean'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
@@ -7853,6 +7866,7 @@ export namespace Prisma {
     emailVerified: 'emailVerified',
     image: 'image',
     password: 'password',
+    provider: 'provider',
     isadmin: 'isadmin',
     isactive: 'isactive',
     createdAt: 'createdAt',
@@ -8033,6 +8047,7 @@ export namespace Prisma {
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     image?: StringNullableFilter<"User"> | string | null
     password?: StringNullableFilter<"User"> | string | null
+    provider?: StringNullableFilter<"User"> | string | null
     isadmin?: BoolFilter<"User"> | boolean
     isactive?: BoolFilter<"User"> | boolean
     createdAt?: DateTimeFilter<"User"> | Date | string
@@ -8050,6 +8065,7 @@ export namespace Prisma {
     emailVerified?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
     password?: SortOrderInput | SortOrder
+    provider?: SortOrderInput | SortOrder
     isadmin?: SortOrder
     isactive?: SortOrder
     createdAt?: SortOrder
@@ -8070,6 +8086,7 @@ export namespace Prisma {
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     image?: StringNullableFilter<"User"> | string | null
     password?: StringNullableFilter<"User"> | string | null
+    provider?: StringNullableFilter<"User"> | string | null
     isadmin?: BoolFilter<"User"> | boolean
     isactive?: BoolFilter<"User"> | boolean
     createdAt?: DateTimeFilter<"User"> | Date | string
@@ -8087,6 +8104,7 @@ export namespace Prisma {
     emailVerified?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
     password?: SortOrderInput | SortOrder
+    provider?: SortOrderInput | SortOrder
     isadmin?: SortOrder
     isactive?: SortOrder
     createdAt?: SortOrder
@@ -8108,6 +8126,7 @@ export namespace Prisma {
     emailVerified?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     image?: StringNullableWithAggregatesFilter<"User"> | string | null
     password?: StringNullableWithAggregatesFilter<"User"> | string | null
+    provider?: StringNullableWithAggregatesFilter<"User"> | string | null
     isadmin?: BoolWithAggregatesFilter<"User"> | boolean
     isactive?: BoolWithAggregatesFilter<"User"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -8440,6 +8459,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     image?: string | null
     password?: string | null
+    provider?: string | null
     isadmin?: boolean
     isactive?: boolean
     createdAt?: Date | string
@@ -8457,6 +8477,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     image?: string | null
     password?: string | null
+    provider?: string | null
     isadmin?: boolean
     isactive?: boolean
     createdAt?: Date | string
@@ -8474,6 +8495,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
     isadmin?: BoolFieldUpdateOperationsInput | boolean
     isactive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -8491,6 +8513,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
     isadmin?: BoolFieldUpdateOperationsInput | boolean
     isactive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -8508,6 +8531,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     image?: string | null
     password?: string | null
+    provider?: string | null
     isadmin?: boolean
     isactive?: boolean
     createdAt?: Date | string
@@ -8523,6 +8547,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
     isadmin?: BoolFieldUpdateOperationsInput | boolean
     isactive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -8538,6 +8563,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
     isadmin?: BoolFieldUpdateOperationsInput | boolean
     isactive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -8988,6 +9014,7 @@ export namespace Prisma {
     emailVerified?: SortOrder
     image?: SortOrder
     password?: SortOrder
+    provider?: SortOrder
     isadmin?: SortOrder
     isactive?: SortOrder
     createdAt?: SortOrder
@@ -9003,6 +9030,7 @@ export namespace Prisma {
     emailVerified?: SortOrder
     image?: SortOrder
     password?: SortOrder
+    provider?: SortOrder
     isadmin?: SortOrder
     isactive?: SortOrder
     createdAt?: SortOrder
@@ -9018,6 +9046,7 @@ export namespace Prisma {
     emailVerified?: SortOrder
     image?: SortOrder
     password?: SortOrder
+    provider?: SortOrder
     isadmin?: SortOrder
     isactive?: SortOrder
     createdAt?: SortOrder
@@ -9882,6 +9911,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     image?: string | null
     password?: string | null
+    provider?: string | null
     isadmin?: boolean
     isactive?: boolean
     createdAt?: Date | string
@@ -9898,6 +9928,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     image?: string | null
     password?: string | null
+    provider?: string | null
     isadmin?: boolean
     isactive?: boolean
     createdAt?: Date | string
@@ -9930,6 +9961,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
     isadmin?: BoolFieldUpdateOperationsInput | boolean
     isactive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -9946,6 +9978,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
     isadmin?: BoolFieldUpdateOperationsInput | boolean
     isactive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -9962,6 +9995,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     image?: string | null
     password?: string | null
+    provider?: string | null
     isadmin?: boolean
     isactive?: boolean
     createdAt?: Date | string
@@ -9978,6 +10012,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     image?: string | null
     password?: string | null
+    provider?: string | null
     isadmin?: boolean
     isactive?: boolean
     createdAt?: Date | string
@@ -10010,6 +10045,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
     isadmin?: BoolFieldUpdateOperationsInput | boolean
     isactive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10026,6 +10062,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
     isadmin?: BoolFieldUpdateOperationsInput | boolean
     isactive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

@@ -23,6 +23,7 @@ model User {
   emailVerified DateTime? @db.Timestamp(6)
   image         String?
   password      String?
+  provider      String?   @default("credentials")
   isadmin       Boolean   @default(false)
   isactive      Boolean   @default(true)
   createdAt     DateTime  @default(now()) @db.Timestamp(6)

@@ -7,8 +7,8 @@ import { AuthError } from "next-auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import User from "@/models/users";
 import bcryptjs from "bcryptjs";
-import connectDB from "@/config/database";
-import { convertToPlainObject } from "@/lib/utils";
+
+
 
 // Constants
 const BCRYPT_SALT_ROUNDS = 12;
@@ -104,9 +104,6 @@ export async function signUp(
     // Here you would typically call your backend API to create the user
     // For demonstration, we'll assume the user is created successfully
 
-    //check if user already exists logic would go here in a real app
-    await connectDB();
-    
     const userAlreadyExists = await User.findOne({ email });
     if (userAlreadyExists) {
       return {
@@ -123,7 +120,8 @@ export async function signUp(
       last_name,
       name: `${first_name} ${last_name}`,
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      provider: 'credentials' // Track that user signed up with credentials
     });
     await newUser.save();
 
