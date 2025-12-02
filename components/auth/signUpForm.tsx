@@ -3,7 +3,7 @@
 import Input from "@/components/common/form/input/InputField";
 import Label from "@/components/common/form/Label";
 import Button from "@/components/ui/button/Button";
-import { TbArrowLeft, TbEye, TbEyeOff, TbBrandGoogle, TbBrandX } from 'react-icons/tb';
+import { TbArrowLeft, TbEye, TbEyeOff, } from 'react-icons/tb';
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { signUp } from "@/actions/authActions";

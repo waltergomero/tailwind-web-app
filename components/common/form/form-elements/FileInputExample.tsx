@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
-import ComponentCard from "../../common/ComponentCard";
-import FileInput from "../input/FileInput";
-import Label from "../Label";
+import ComponentCard from "@/components/common/ComponentCard";
+import FileInput from "@/components/common/form/input/FileInput";
+import Label from "@/components/common/form//Label";
 
 export default function FileInputExample() {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

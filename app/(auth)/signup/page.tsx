@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import SignUpForm from '@/components/auth/signUpForm';
 
 const SignUpPage = () => {
   return (
     <div>
-      <SignUpForm />
+      <Suspense fallback={<div>Loading...</div>}>
+        <SignUpForm />
+      </Suspense>
     </div>    
   )
 }

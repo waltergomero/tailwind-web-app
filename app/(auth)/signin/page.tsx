@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import SignInForm from '@/components/auth/signInForm';
 
 const SignInPage = () => {
   return (
-    <div><SignInForm /></div>
+    <div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <SignInForm />
+      </Suspense>
+    </div>
   )
 }
 
