@@ -166,7 +166,7 @@ const CategoryTable = ({ data, onDelete }: CategoryTableProps) => {
                   <TableCell className="px-4 py-2 text-gray-500 text-theme-sm dark:text-gray-400">
                     <div className="flex items-center justify-center gap-4">
                         <Link 
-                          href={`/admin/category/${category.id}`}
+                          href={`/admin/categories/${category.id}`}
                           title="Edit category"
                           aria-label={`Edit ${category.category_name}`}
                         >

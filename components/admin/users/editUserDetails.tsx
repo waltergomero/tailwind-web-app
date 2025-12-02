@@ -72,7 +72,7 @@ export default function UserDetailForm({  data }: { data?: any }) {
                 <Input type="email" name="email" className="w-full" defaultValue={data.email} />
                {<ZodErrors error={[fieldErrors.email]} />}
               </div>
-             <div className="relative">
+             <div className="relative pt-2">
                 <Label>Password:</Label>
                 <Input
                   name="password"

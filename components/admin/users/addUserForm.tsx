@@ -71,7 +71,8 @@ export default function AddUserForm() {
                 <Input type="email" name="email" className="w-full"  />
                {<ZodErrors error={[fieldErrors.email]} />}
               </div>
-             <div className="relative">
+             <div className="relative pt-2">
+                  <Label>Password:</Label>
                                  <Input
                                    name="password"
                                    id="password"
@@ -100,7 +101,7 @@ export default function AddUserForm() {
                 Cancel
               </Button>
               <Button size="sm" type="submit">
-                Save Changes
+                Save User Information
               </Button>
             </div>     
           </Form>
