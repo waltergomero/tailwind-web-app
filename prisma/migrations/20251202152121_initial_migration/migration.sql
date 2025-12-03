@@ -8,6 +8,7 @@ CREATE TABLE "User" (
     "emailVerified" TIMESTAMP(6),
     "image" TEXT,
     "password" TEXT,
+    "provider" TEXT DEFAULT 'credentials',
     "isadmin" BOOLEAN NOT NULL DEFAULT false,
     "isactive" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -56,18 +57,6 @@ CREATE TABLE "VerificationToken" (
 );
 
 -- CreateTable
-CREATE TABLE "Category" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "category_name" TEXT NOT NULL,
-    "description" TEXT,
-    "isactive" BOOLEAN DEFAULT true,
-    "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3),
-
-    CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Status" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "status_name" TEXT NOT NULL,
@@ -78,6 +67,19 @@ CREATE TABLE "Status" (
     "updatedAt" TIMESTAMP(3),
 
     CONSTRAINT "Status_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Category" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "category_name" TEXT NOT NULL,
+    "parent_category_id" TEXT,
+    "description" TEXT,
+    "isactive" BOOLEAN DEFAULT true,
+    "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3),
+
+    CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex

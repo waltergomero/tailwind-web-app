@@ -166,21 +166,23 @@ exports.Prisma.VerificationTokenScalarFieldEnum = {
   expires: 'expires'
 };
 
-exports.Prisma.CategoryScalarFieldEnum = {
-  id: 'id',
-  category_name: 'category_name',
-  description: 'description',
-  isactive: 'isactive',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
 exports.Prisma.StatusScalarFieldEnum = {
   id: 'id',
   status_name: 'status_name',
   description: 'description',
   isactive: 'isactive',
   typeid: 'typeid',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CategoryScalarFieldEnum = {
+  id: 'id',
+  category_name: 'category_name',
+  parent_category_id: 'parent_category_id',
+  parent_category_name: 'parent_category_name',
+  description: 'description',
+  isactive: 'isactive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -206,8 +208,8 @@ exports.Prisma.ModelName = {
   Account: 'Account',
   Session: 'Session',
   VerificationToken: 'VerificationToken',
-  Category: 'Category',
-  Status: 'Status'
+  Status: 'Status',
+  Category: 'Category'
 };
 
 /**

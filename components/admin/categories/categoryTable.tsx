@@ -119,8 +119,11 @@ const CategoryTable = ({ data, onDelete }: CategoryTableProps) => {
                   ID
                 </TableCell>
                 <TableCell isHeader className="px-5 py-3 font-semibold text-gray-200 text-start text-theme-xs dark:text-gray-200">
-                  Category Name
+                  Parent Category Name
                 </TableCell>
+                <TableCell isHeader className="px-5 py-3 font-semibold text-gray-200 text-start text-theme-xs dark:text-gray-200">
+                  Category Name
+                </TableCell>               
                 <TableCell  isHeader  className="px-5 py-3 font-semibold text-gray-200 text-start text-theme-xs dark:text-gray-200">
                   Description
                 </TableCell>
@@ -146,6 +149,9 @@ const CategoryTable = ({ data, onDelete }: CategoryTableProps) => {
                 <TableRow key={category.id}>
                   <TableCell className="px-5 py-2 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     {formatId(category.id)}
+                  </TableCell>                  
+                  <TableCell className="px-4 py-2 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    {category.parent_category_name}
                   </TableCell>
                   <TableCell className="px-4 py-2 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     {category.category_name}

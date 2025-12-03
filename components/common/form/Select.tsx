@@ -42,19 +42,14 @@ const Select: React.FC<SelectProps> = ({
       value={selectedValue}
       onChange={handleChange}
     >
-      {/* Placeholder option */}
-      <option
-        value=""
-        disabled
-        className="text-gray-700 dark:bg-gray-900 dark:text-gray-400"
-      >
-        {placeholder}
-      </option>
-      {/* Map over options */}
-      {options.map((option) => (
+      {[
+        { value: "", label: placeholder, disabled: true },
+        ...options
+      ].map((option, index) => (
         <option
-          key={option.value}
+          key={option.value || `option-${index}`}
           value={option.value}
+          disabled={index === 0}
           className="text-gray-700 dark:bg-gray-900 dark:text-gray-400"
         >
           {option.label}

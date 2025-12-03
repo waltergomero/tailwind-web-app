@@ -5,7 +5,7 @@ import { AuthError } from "next-auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import prisma  from '@/lib/prisma';
 import { ZodError } from "zod";
-import { ICategory } from "@/interfaces/interface";
+import { ICategory, IParentCategory} from "@/interfaces/interface";
 
 
 
@@ -22,20 +22,20 @@ export async function fetchAllCategories(): Promise<{ data: ICategory[] }> {
       select: {
         id: true,
         category_name: true,
+        parent_category_id: true,
+        parent_category_name: true,
         description: true,
         isactive: true,
-        createdAt: true,
-        updatedAt: true,
       },
     });
 
     const data: ICategory[] = categories.map((category: typeof categories[0]) => ({
       id: category.id,
       category_name: category.category_name,
+      parent_category_id: category.parent_category_id ?? '',
+      parent_category_name: category.parent_category_name ?? '',
       description: category.description ?? '',
       isactive: category.isactive ?? false,
-      createdAt: category.createdAt.toISOString(),
-      updatedAt: category.updatedAt?.toISOString() ?? '',
     }));
 
  
@@ -60,6 +60,8 @@ export async function getCategoryById(id: string): Promise<ICategory | null> {
     return {
       id: category.id,
       category_name: category.category_name,
+      parent_category_id: category.parent_category_id ?? '',
+      parent_category_name: category.parent_category_name ?? '',
       description: category.description ?? '',
       isactive: category.isactive ?? false,
       createdAt: category.createdAt.toISOString(),
@@ -72,20 +74,97 @@ export async function getCategoryById(id: string): Promise<ICategory | null> {
 }
 
 /**
+ * get parent categories from the database with full hierarchical path
+ */
+export async function fetchParentCategories(): Promise<{ data: IParentCategory[] }> {
+  try {
+    // Get categories that have child categories OR have no parent (top-level categories)
+    const parentCategories = await prisma.$queryRaw<
+      { parent_category_id: string; parent_category_name: string; }[]
+    >`SELECT DISTINCT c1.parent_category_id, c1.parent_category_name
+      FROM "Category" c1
+      WHERE c1.parent_category_id IS NOT NULL
+      UNION
+      SELECT DISTINCT id as parent_category_id, category_name AS parent_category_name
+      FROM "Category" c2
+      ORDER BY parent_category_name ASC
+      ;`;
+
+    // Build hierarchical path for each parent category
+    const parentCategoriesWithPath = await Promise.all(
+      parentCategories.map(async (parentCategory: { parent_category_id: string; parent_category_name: string; }) => {
+        const fullPath = await getCategoryPath(parentCategory.parent_category_id);
+        return {
+          parent_category_id: parentCategory.parent_category_id,
+          parent_category_name: fullPath || parentCategory.parent_category_name
+        };
+      })
+    );
+
+    // Remove duplicates based on parent_category_id
+    const uniqueCategories = parentCategoriesWithPath.filter(
+      (category: IParentCategory, index: number, self: IParentCategory[]) =>
+        index === self.findIndex((c: IParentCategory) => c.parent_category_id === category.parent_category_id)
+    );
+ 
+    return { data: uniqueCategories };
+  } catch (error) {
+    console.error("Error fetching parent categories:", error);
+    return { data: [] };
+  }
+}
+
+/**
+ * Build hierarchical category path (e.g., "Countries >> Peru >> Lima")
+ * @param categoryId - The ID of the category to build the path for
+ * @returns Promise containing the full hierarchical path string
+ */
+export async function getCategoryPath(categoryId: string): Promise<string> {
+  try {
+    const path: string[] = [];
+    let currentId: string | null = categoryId;
+
+    // Traverse up the parent chain
+    while (currentId) {
+      const category: { category_name: string; parent_category_id: string | null } | null = await prisma.category.findUnique({
+        where: { id: currentId },
+        select: {
+          category_name: true,
+          parent_category_id: true,
+        },
+      });
+
+      if (!category) break;
+
+      path.unshift(category.category_name); // Add to beginning of array
+      currentId = category.parent_category_id;
+    }
+
+    return path.join(' >> ');
+  } catch (error) {
+    console.error("Error building category path:", error);
+    return '';
+  }
+}
+
+
+/**
  * add a new category to the database
  */
 export async function addCategory(data: FormData) {
+  console.log('addCategory called with data:', data);
   try {
     const category_name = data.get("category_name") as string
     const description = data.get("description") as string;
-    //const isactive = data.get("isactive") === "on" ? true : false;  
+    const parent_category_id = data.get("parent_category_id") as string || null;
+    const parent_category_name = data.get("parent_category_name") as string || null;
 
     // Validate all fields - this will throw ZodError if validation fails
-    const validatedData = addCategoryFormSchema.parse({ category_name, description });
+    const validatedData = addCategoryFormSchema.parse({ category_name, description, parent_category_id, parent_category_name });
 
-    //check for duplicate status_name
+    //check for duplicate category_name under the same parent
     const existingCategory = await prisma.category.findFirst({
-      where: { category_name: validatedData.category_name, }  
+      where: { category_name: validatedData.category_name, parent_category_id: validatedData.parent_category_id }  
         });
     if (existingCategory) {
       return {
@@ -98,6 +177,8 @@ export async function addCategory(data: FormData) {
     const newCategory = await prisma.category.create({
       data: {
         category_name: validatedData.category_name,
+        parent_category_id: validatedData.parent_category_id,
+        parent_category_name: validatedData.parent_category_name,
         description: validatedData.description
       },
     });
@@ -144,16 +225,18 @@ export async function updateCategory(data: FormData) {
     const category_name = data.get("category_name") as string;
     const id = data.get("id") as string;
     const description = data.get("description") as string;
+    const parent_category_id = data.get("parent_category_id") as string;
     const isactive = data.get("isactive") === "on" ? true : false;  
 
     // Validate all fields - this will throw ZodError if validation fails
-    const validatedData = addCategoryFormSchema.parse({ category_name, description });
+    const validatedData = addCategoryFormSchema.parse({ category_name, description, parent_category_id });
 
     //check for duplicate category_name
     const existingCategory = await prisma.category.findFirst({
       where: { category_name: validatedData.category_name }  
         });
-    if (existingCategory && existingCategory.id !== id) {
+
+    if (existingCategory && existingCategory.id !== id && existingCategory.parent_category_id === parent_category_id) {
       return {
         success: false,
         message: 'A category with this name already exists.',
@@ -165,7 +248,8 @@ export async function updateCategory(data: FormData) {
     where: { id },
       data: {
         category_name: validatedData.category_name,
-        description,
+        parent_category_id: validatedData.parent_category_id,
+        description: validatedData.description,
         isactive
       },
     });

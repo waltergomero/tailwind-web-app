@@ -23,8 +23,15 @@ export interface IStatus {
 export interface ICategory {
   id: string;
   category_name: string;
+  parent_category_id: string;
+  parent_category_name: string;
   description: string;
   isactive: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface IParentCategory {
+  parent_category_id: string;
+  parent_category_name: string;
 }

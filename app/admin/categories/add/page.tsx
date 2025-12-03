@@ -1,9 +1,11 @@
 import React from 'react';
 import AddCategoryForm from '@/components/admin/categories/addCategoryForm';
+import { fetchParentCategories } from '@/actions/categories';
 
-const CategoryPage = () => {
+const CategoryPage = async () => {
+  const parentCategories = await fetchParentCategories();
   return (
-    <AddCategoryForm />
+    <AddCategoryForm parentCategories={parentCategories.data} />
   )
 }
 
