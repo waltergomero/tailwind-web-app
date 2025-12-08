@@ -83,7 +83,7 @@ export default function UserDetailForm({  data }: { data?: any }) {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
+                  className="absolute z-30 -translate-y-1/2 cursor-pointer right-4  top-3/4"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (

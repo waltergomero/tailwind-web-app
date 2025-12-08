@@ -15,7 +15,7 @@ const sampleData = {
     {
       first_name: 'Luisa',
       last_name: 'Gomero',
-      email: 'luisa.gomero@gmail.com',
+      email: 'luisaqgomero@hotmail.com',
       password: hashedPassword,
       isadmin: false,
     },
