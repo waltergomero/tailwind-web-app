@@ -50,7 +50,7 @@ const UserDetailsPage = async ({ params }: { params: Promise<{ id: string }> }) 
   }
   
   const user = await getUserById(id);
-  
+  console.log('Fetched user data:', user);
   return (
     <UserDetailsForm data={user} />
   )

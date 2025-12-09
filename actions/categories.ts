@@ -221,15 +221,17 @@ export async function addCategory(data: FormData) {
  * update a category in the database
  */
 export async function updateCategory(data: FormData) {
+  console.log('updateCategory called with data:', data);
   try {
     const category_name = data.get("category_name") as string;
     const id = data.get("id") as string;
     const description = data.get("description") as string;
     const parent_category_id = data.get("parent_category_id") as string;
+    const parent_category_name =data.get("parent_category_name") as string;
     const isactive = data.get("isactive") === "on" ? true : false;  
 
     // Validate all fields - this will throw ZodError if validation fails
-    const validatedData = addCategoryFormSchema.parse({ category_name, description, parent_category_id });
+    const validatedData = updateCategoryFormSchema.parse({ category_name,  parent_category_id, parent_category_name, description, isactive });
 
     //check for duplicate category_name
     const existingCategory = await prisma.category.findFirst({

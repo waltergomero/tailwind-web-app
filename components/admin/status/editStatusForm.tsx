@@ -52,11 +52,15 @@ export default function EditStatusForm({  data }: { data?: any }) {
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="w-full">
           <h4 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-6">
-            Add New Status
+            Edit Status Details
           </h4>
           <Form onSubmit={handleSave}>
-           <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
             <input type="hidden" name="id" value={data?.id} />
+            <div className="pb-4 flex items-center gap-2">
+              <Label className="mb-0">Status Id:</Label>
+              <span>{data.id}</span>
+            </div>
+           <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">           
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Status Name:</Label>
                     <Input type="text" name="status_name" className="w-full" defaultValue={data?.status_name} />

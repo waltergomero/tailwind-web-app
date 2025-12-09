@@ -53,8 +53,12 @@ export default function UserDetailForm({  data }: { data?: any }) {
             Edit User Details
           </h4>
           <Form onSubmit={handleSave}>
-           <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-             <input type="hidden" name="id" defaultValue={data.id}/>
+            <input type="hidden" name="id" defaultValue={data.id}/>
+            <div className="pb-4 flex items-center gap-2">
+              <Label className="mb-0">User Id:</Label>
+              <span>{data.id}</span>
+            </div>
+            <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">                 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>First Name:</Label>
                     <Input type="text" name="first_name" className="w-full" defaultValue={data.first_name} />

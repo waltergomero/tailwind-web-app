@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { useSession, signOut  } from "next-auth/react";
-import { FaSignOutAlt, FaSlack, FaUserAlt, FaQuestionCircle, FaAngleDown} from "react-icons/fa";
+import { FaSignOutAlt, FaSlack, FaUserAlt, FaQuestionCircle, FaAngleDown, FaUser} from "react-icons/fa";
 
 export default function UserDropdown() {
   const { data: session } = useSession();
@@ -26,12 +26,16 @@ function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         className="flex items-center text-gray-700 dark:text-gray-400 dropdown-toggle"
       >
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          <Image
-            width={44}
-            height={44}
-            src="/images/user/owner.jpg"
-            alt="User"
-          />
+          {session?.user?.image ? (
+            <Image
+              src={session.user.image}
+              width={44}
+              height={44}
+              alt="User"
+            />
+          ) : (
+            <FaUser className="w-11 h-11 text-gray-400" />
+          )}  
         </span>
 
         <span className="block mr-1 font-medium text-theme-sm">{session?.user?.first_name}</span>

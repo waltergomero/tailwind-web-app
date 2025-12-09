@@ -20,7 +20,7 @@ export default function EditCategoryForm({  data, parentCategories }: { data?: a
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-   const [parentCategoryName, setParentCategoryName] = useState<string>('');
+   const [parentCategoryName, setParentCategoryName] = useState<string>(data?.parent_category_name || '');
 
 
   const handleSave = async (event: React.FormEvent<HTMLFormElement>): Promise<{ success: boolean }> => {
@@ -28,6 +28,7 @@ export default function EditCategoryForm({  data, parentCategories }: { data?: a
       const formData = new FormData(event.currentTarget);
       // Append parent_category_name to formData
       formData.append('parent_category_name', parentCategoryName);
+      console.log('Form submission result:', formData);
       const result = await updateCategory(formData);
       console.log('Form submission result:', result);
       
@@ -57,6 +58,11 @@ export default function EditCategoryForm({  data, parentCategories }: { data?: a
             Edit Category Information
           </h4>
           <Form onSubmit={handleSave}>
+            <input type="hidden" name="id" value={data?.id} />
+            <div className="pb-4 flex items-center gap-2">
+              <Label className="mb-0">Category Id:</Label>
+              <span>{data.id}</span>
+            </div>
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
             <div className="col-span-2 lg:col-span-1">               
             <Label>Category Name:</Label>
