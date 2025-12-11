@@ -70,13 +70,13 @@ const NavBar = () => {
                 href={link.href}
                 className={`relative px-3 py-2 text-sm font-medium transition-colors ${
                   isActive(link.href)
-                    ? 'text-blue-400'
-                    : 'text-gray-200 hover:text-blue-400'
+                    ? 'text-gray-100'
+                    : 'text-gray-200 hover:text-gray-400'
                 }`}
               >
                 {link.label}
                 {isActive(link.href) && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-400" />
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-100" />
                 )}
               </Link>
             ))}
@@ -86,9 +86,9 @@ const NavBar = () => {
           <div className="hidden md:block">
             <Link
               href="/signin"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
             >
-              Get Started
+              Sign In
             </Link>
           </div>
 
@@ -96,7 +96,7 @@ const NavBar = () => {
           <button
             type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-200 hover:text-blue-400 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-colors"
+            className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-100 hover:text-gray-100 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-500 transition-colors"
             aria-expanded={isOpen ? 'true' : 'false'}
             aria-label="Toggle navigation menu"
           >
@@ -124,8 +124,8 @@ const NavBar = () => {
               href={link.href}
               className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
                 isActive(link.href)
-                  ? 'bg-gray-600 text-blue-400'
-                  : 'text-gray-200 hover:bg-gray-600 hover:text-blue-400'
+                  ? 'bg-gray-600 text-gray-100'
+                  : 'text-gray-200 hover:bg-gray-600 hover:text-gray-100'
               }`}
             >
               {link.label}
@@ -134,9 +134,9 @@ const NavBar = () => {
           <div className="pt-4 px-3">
             <Link
               href="/signin"
-              className="block w-full text-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              className="block w-full text-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
             >
-              Get Started
+              Sign In
             </Link>
           </div>
         </div>

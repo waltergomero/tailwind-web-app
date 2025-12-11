@@ -116,10 +116,10 @@ const AppSidebar: React.FC = () => {
           {nav.subItems ? (
             <button
               onClick={() => handleSubmenuToggle(index, menuType)}
-              className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg transition-colors duration-200 cursor-pointer ${
+              className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer ${
                 openSubmenu?.type === menuType && openSubmenu?.index === index
-                  ? "bg-brand-500/10 text-brand-500"
-                  : "text-gray-300 hover:bg-gray-800"
+                  ? "bg-gray-700 text-gray-100 border-l-4 border-brand-400 shadow-lg shadow-brand-500/20"
+                  : "text-gray-300 hover:bg-gray-800 border-l-4 border-transparent"
               } ${
                 !isExpanded && !isHovered
                   ? "lg:justify-center"
@@ -129,14 +129,18 @@ const AppSidebar: React.FC = () => {
               <span
                 className={`shrink-0 w-5 h-5 ${
                   openSubmenu?.type === menuType && openSubmenu?.index === index
-                    ? "text-brand-500"
+                    ? "text-brand-400"
                     : "text-gray-400"
                 }`}
               >
                 {nav.icon}
               </span>
               {(isExpanded || isHovered || isMobileOpen) && (
-                <span className="font-medium text-sm">{nav.name}</span>
+                <span className={`text-sm ${
+                  openSubmenu?.type === menuType && openSubmenu?.index === index
+                    ? "font-bold"
+                    : "font-medium"
+                }`}>{nav.name}</span>
               )}
               {(isExpanded || isHovered || isMobileOpen) && (
                 <FaChevronDown
@@ -153,23 +157,25 @@ const AppSidebar: React.FC = () => {
             nav.path && (
               <Link
                 href={nav.path}
-                className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg transition-colors duration-200 ${
+                className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg transition-all duration-200 ${
                   isActive(nav.path) 
-                    ? "bg-brand-500/10 text-brand-500" 
-                    : "text-gray-300 hover:bg-gray-800"
+                    ? "bg-gray-700 text-gray-100 border-l-4 border-brand-400 shadow-lg shadow-brand-500/20" 
+                    : "text-gray-300 hover:bg-gray-800 border-l-4 border-transparent"
                 }`}
               >
                 <span
                   className={`shrink-0 w-5 h-5 ${
                     isActive(nav.path)
-                      ? "text-brand-500"
+                      ? "text-brand-400"
                       : "text-gray-400"
                   }`}
                 >
                   {nav.icon}
                 </span>
                 {(isExpanded || isHovered || isMobileOpen) && (
-                  <span className="font-medium text-sm">{nav.name}</span>
+                  <span className={`text-sm ${
+                    isActive(nav.path) ? "font-bold" : "font-medium"
+                  }`}>{nav.name}</span>
                 )}
               </Link>
             )
@@ -190,10 +196,10 @@ const AppSidebar: React.FC = () => {
                   <li key={subItem.name}>
                     <Link
                       href={subItem.path}
-                      className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${
+                      className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
                         isActive(subItem.path)
-                          ? "text-brand-500 bg-brand-500/5 font-medium"
-                          : "text-gray-400 hover:bg-gray-800/50"
+                          ? "text-gray-100 bg-gray-700 font-bold border-l-4 border-brand-400 shadow-md shadow-brand-500/10"
+                          : "text-gray-400 hover:bg-gray-800/50 border-l-4 border-transparent"
                       }`}
                     >
                       {subItem.name}
