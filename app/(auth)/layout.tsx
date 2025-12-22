@@ -12,11 +12,11 @@ export default function AuthLayout({
     <div className="relative p-2 bg-white z-1 dark:bg-gray-900 sm:p-0">
       <ThemeProvider>
         <div className="relative flex lg:flex-row w-full h-screen justify-center flex-col  dark:bg-gray-900 sm:p-0">        
-          <div className="w-full h-full bg-brand-950 dark:bg-white/5 lg:grid items-center hidden">
-            <div className="relative items-center justify-center  flex z-1">
+          <div className="w-full h-full bg-brand-950 dark:bg-white/5 flex lg:grid items-center justify-center p-6 sm:p-8 lg:p-0">
+            <div className="relative items-center justify-center flex z-1 w-full">
               {/* <!-- ===== Common Grid Shape Start ===== --> */}
               <GridShape />
-              <div className="flex flex-col items-center max-w-xlg">
+              <div className="flex flex-col items-center max-w-xlg w-full px-6 sm:px-8 lg:px-4">
                  {children}
               </div>
             </div>
