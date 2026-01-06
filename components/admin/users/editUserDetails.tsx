@@ -54,9 +54,9 @@ export default function UserDetailForm({  data }: { data?: any }) {
           </h4>
           <Form onSubmit={handleSave}>
             <input type="hidden" name="id" defaultValue={data.id}/>
-            <div className="pb-4 flex items-center gap-2">
+            <div className="pb-4 ">
               <Label className="mb-0">User Id:</Label>
-              <span>{data.id}</span>
+              <Input type="text" disabled className="w-full" defaultValue={data?.id}  />
             </div>
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">                 
                   <div className="col-span-2 lg:col-span-1">
